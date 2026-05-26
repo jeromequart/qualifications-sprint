@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Qualifications Régionaux — SCO Sprint Crew</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange: #E8A020;
+    --orange2: #F5C842;
+    --dark: #0F0F1A;
+    --dark2: #1A1A2E;
+    --dark3: #252540;
+    --card: #1E1E35;
+    --border: rgba(255,255,255,0.08);
+    --text: #F0F0F0;
+    --muted: #8888AA;
+    --green: #2ECC71;
+    --green-bg: rgba(46,204,113,0.12);
+    --red: #E74C3C;
+    --red-bg: rgba(231,76,60,0.12);
+    --yellow: #F39C12;
+    --yellow-bg: rgba(243,156,18,0.12);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    background: var(--dark);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--dark2);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 20px;
+    letter-spacing: 1px;
+  }
+  .logo span { color: var(--orange); }
+  .header-sub {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: right;
+    line-height: 1.4;
+  }
+
+  /* ── LAYOUT ── */
+  .app {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    min-height: calc(100vh - 57px);
+  }
+
+  @media (max-width: 768px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    background: var(--dark2);
+    border-right: 1px solid var(--border);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .sidebar-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--orange);
+    text-transform: uppercase;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .add-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .add-form input, .add-form select {
+    background: var(--dark3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-size: 13px;
+    padding: 8px 10px;
+    width: 100%;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .add-form input:focus, .add-form select:focus {
+    border-color: var(--orange);
+  }
+  .add-form select option { background: var(--dark3); }
+
+  .btn-add {
+    background: var(--orange);
+    color: var(--dark);
+    border: none;
+    border-radius: 6px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 1px;
+    padding: 9px;
+    cursor: pointer;
+    transition: opacity .2s;
+    text-transform: uppercase;
+  }
+  .btn-add:hover { opacity: .85; }
+
+  /* ── ATHLETES LIST ── */
+  .athletes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow-y: auto;
+    max-height: 400px;
+  }
+
+  @media (max-width: 768px) {
+    .athletes-list { max-height: 200px; }
+  }
+
+  .athlete-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--dark3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+  }
+  .athlete-item:hover { border-color: var(--orange); background: rgba(232,160,32,0.05); }
+  .athlete-item.active { border-color: var(--orange); background: rgba(232,160,32,0.08); }
+
+  .athlete-name {
+    font-weight: 600;
+    font-size: 13px;
+  }
+  .athlete-cat {
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .athlete-badges {
+    display: flex;
+    gap: 3px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .mini-badge {
+    font-size: 9px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    padding: 2px 5px;
+    border-radius: 3px;
+    text-transform: uppercase;
+  }
+  .mini-badge.q { background: var(--green-bg); color: var(--green); }
+  .mini-badge.nq { background: var(--red-bg); color: var(--red); }
+
+  .btn-delete {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 2px 4px;
+    border-radius: 3px;
+    transition: color .2s;
+    margin-left: 6px;
+  }
+  .btn-delete:hover { color: var(--red); }
+
+  /* ── MAIN ── */
+  .main {
+    padding: 20px;
+    overflow-y: auto;
+  }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    color: var(--muted);
+    gap: 10px;
+    text-align: center;
+  }
+  .empty-state .icon { font-size: 40px; opacity: .4; }
+  .empty-state p { font-size: 14px; line-height: 1.6; }
+
+  /* ── ATHLETE DETAIL ── */
+  .detail-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .detail-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 30px;
+    line-height: 1;
+  }
+  .detail-meta {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .global-status {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .global-status.q { background: var(--green-bg); color: var(--green); border: 1px solid var(--green); }
+  .global-status.nq { background: var(--red-bg); color: var(--red); border: 1px solid var(--red); }
+  .global-status.partial { background: var(--yellow-bg); color: var(--yellow); border: 1px solid var(--yellow); }
+  .global-status.none { background: rgba(136,136,170,0.1); color: var(--muted); border: 1px solid var(--border); }
+
+  /* ── EVENTS GRID ── */
+  .events-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  .event-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    transition: border-color .2s;
+  }
+  .event-card.qualified { border-color: var(--green); }
+  .event-card.not-qualified { border-color: var(--red); }
+  .event-card.no-perf { border-color: var(--border); }
+
+  .event-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--orange);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .perf-input-group {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+    align-items: center;
+  }
+  .perf-input-group label {
+    font-size: 11px;
+    color: var(--muted);
+    width: 36px;
+    flex-shrink: 0;
+  }
+
+  .time-inputs {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+  }
+  .time-inputs input {
+    background: var(--dark3);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--text);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    text-align: center;
+    outline: none;
+    transition: border-color .2s;
+    padding: 5px 2px;
+  }
+  .time-inputs input:focus { border-color: var(--orange); }
+  .time-inputs input.min { width: 38px; }
+  .time-inputs input.sec { width: 38px; }
+  .time-inputs input.cent { width: 38px; }
+  .time-inputs .sep {
+    color: var(--muted);
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  .minima-line {
+    font-size: 11px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .minima-line span { color: var(--text); font-weight: 600; }
+
+  .result-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 8px;
+  }
+  .result-badge.q { background: var(--green-bg); color: var(--green); }
+  .result-badge.nq { background: var(--red-bg); color: var(--red); }
+  .result-badge.none { background: rgba(136,136,170,0.08); color: var(--muted); }
+
+  .ecart {
+    font-size: 11px;
+    margin-top: 4px;
+    display: block;
+  }
+  .ecart.pos { color: var(--green); }
+  .ecart.neg { color: var(--red); }
+
+  /* ── SUMMARY TABLE ── */
+  .section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--orange);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    margin-top: 20px;
+  }
+
+  .summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-bottom: 30px;
+  }
+  .summary-table th {
+    background: var(--dark3);
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .summary-table td {
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .summary-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .summary-table .q-cell { color: var(--green); font-weight: 600; }
+  .summary-table .nq-cell { color: var(--red); }
+  .summary-table .none-cell { color: var(--muted); font-style: italic; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .events-grid { grid-template-columns: 1fr 1fr; }
+    .detail-name { font-size: 24px; }
+  }
+  @media (max-width: 400px) {
+    .events-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ── MINIMA PANEL ── */
+  .minima-panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 20px;
+  }
+  .minima-panel-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--orange);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .minima-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
+    font-size: 11px;
+  }
+  .minima-grid .mh {
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 10px;
+    padding: 3px 0;
+  }
+  .minima-grid .mv {
+    color: var(--text);
+    padding: 3px 0;
+    text-align: center;
+  }
+  .minima-grid .mcat {
+    color: var(--orange);
+    font-weight: 700;
+    font-family: 'Barlow Condensed', sans-serif;
+  }
+
+  .btn-export {
+    background: var(--dark3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 6px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 12px;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: border-color .2s;
+    margin-top: 8px;
+  }
+  .btn-export:hover { border-color: var(--orange); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">SCO <span>Sprint Crew</span></div>
+  <div class="header-sub">Qualifications Régionaux 2026<br>Gestion des minimas</div>
+</header>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-title">Athlètes</div>
+
+    <div class="add-form">
+      <input type="text" id="inp-name" placeholder="Prénom Nom" autocomplete="off">
+      <select id="inp-sex">
+        <option value="M">Masculin</option>
+        <option value="F">Féminin</option>
+      </select>
+      <select id="inp-cat">
+        <option value="">-- Catégorie --</option>
+        <!-- Masculin -->
+        <option value="CAM">CAM (Cadet)</option>
+        <option value="JUM">JUM (Junior)</option>
+        <option value="ESM">ESM (Espoir)</option>
+        <option value="SEM">SEM (Senior)</option>
+        <!-- Féminin -->
+        <option value="CAF">CAF (Cadet)</option>
+        <option value="JUF">JUF (Junior)</option>
+        <option value="ESF">ESF (Espoir)</option>
+        <option value="SEF">SEF (Senior)</option>
+      </select>
+      <button class="btn-add" onclick="addAthlete()">+ Ajouter</button>
+    </div>
+
+    <div class="sidebar-title" style="margin-top:4px">Liste</div>
+    <div class="athletes-list" id="athletes-list">
+      <div style="font-size:12px;color:var(--muted);text-align:center;padding:12px;">
+        Aucun athlète ajouté
+      </div>
+    </div>
+
+    <button class="btn-export" onclick="exportCSV()">⬇ Exporter CSV</button>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main" id="main">
+    <div class="empty-state">
+      <div class="icon">🏃</div>
+      <p>Ajoutez un athlète à gauche<br>puis saisissez ses performances.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// DONNÉES MINIMAS (en secondes)
+// ══════════════════════════════════════════════════════════
+const MINIMA = {
+  // MASCULIN
+  CAM: { "100m": 11.75, "200m": 23.80, "400m": 54.70, "110mH": 17.50, "400mH": 63.50 },
+  JUM: { "100m": 11.50, "200m": 23.60, "400m": 53.50, "110mH": 17.00, "400mH": 62.50 },
+  ESM: { "100m": 11.25, "200m": 23.00, "400m": 52.50, "110mH": 17.00, "400mH": 61.50 },
+  SEM: { "100m": 11.20, "200m": 22.80, "400m": 52.00, "110mH": 16.80, "400mH": 59.50 },
+  // FÉMININ
+  CAF: { "100m": 13.15, "200m": 27.10, "400m": 65.00, "100mH": 17.50, "400mH": 75.00 },
+  JUF: { "100m": 13.00, "200m": 26.60, "400m": 64.00, "100mH": 17.50, "400mH": 73.00 },
+  ESF: { "100m": 12.75, "200m": 26.50, "400m": 63.50, "100mH": 16.50, "400mH": 71.00 },
+  SEF: { "100m": 12.65, "200m": 26.40, "400m": 62.50, "100mH": 16.50, "400mH": 69.00 },
+};
+
+const MALE_CATS   = ["CAM","JUM","ESM","SEM"];
+const FEMALE_CATS = ["CAF","JUF","ESF","SEF"];
+
+// Épreuves affichées selon le sexe
+function getEvents(cat) {
+  const isM = MALE_CATS.includes(cat);
+  return [
+    { key:"100m",  label:"100 m" },
+    { key:"200m",  label:"200 m" },
+    { key:"400m",  label:"400 m" },
+    isM ? { key:"110mH", label:"110 m Haies" } : { key:"100mH", label:"100 m Haies" },
+    { key:"400mH", label:"400 m Haies" },
+  ];
+}
+
+// ══════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════
+let athletes = JSON.parse(localStorage.getItem('sco_athletes') || '[]');
+let currentId = null;
+
+function save() {
+  localStorage.setItem('sco_athletes', JSON.stringify(athletes));
+}
+
+// ══════════════════════════════════════════════════════════
+// CONVERSIONS TEMPS
+// ══════════════════════════════════════════════════════════
+function toSeconds(min, sec, cent) {
+  const m = parseInt(min)||0, s = parseInt(sec)||0, c = parseInt(cent)||0;
+  return m*60 + s + c/100;
+}
+
+function formatTime(sec) {
+  if (!sec || sec <= 0) return "—";
+  const m = Math.floor(sec/60);
+  const s = Math.floor(sec%60);
+  const c = Math.round((sec - Math.floor(sec))*100);
+  if (m > 0) return `${m}'${String(s).padStart(2,'0')}"${String(c).padStart(2,'0')}`;
+  return `${s}"${String(c).padStart(2,'0')}`;
+}
+
+function ecartStr(perf, mini) {
+  const diff = perf - mini;
+  if (diff <= 0) return { txt: `↑ ${Math.abs(diff).toFixed(2)}" en dessous`, cls:'pos' };
+  return { txt: `↓ ${diff.toFixed(2)}" au-dessus`, cls:'neg' };
+}
+
+// ══════════════════════════════════════════════════════════
+// QUALIFICATION
+// ══════════════════════════════════════════════════════════
+function isQualified(cat, eventKey, perfSec) {
+  if (!perfSec || perfSec <= 0) return null;
+  const mini = MINIMA[cat]?.[eventKey];
+  if (!mini) return null;
+  return perfSec <= mini;
+}
+
+function getAthleteStatus(athlete) {
+  const events = getEvents(athlete.cat);
+  let qualified = 0, total = 0;
+  for (const ev of events) {
+    const perf = athlete.perfs?.[ev.key];
+    if (perf > 0) {
+      total++;
+      if (isQualified(athlete.cat, ev.key, perf)) qualified++;
+    }
+  }
+  if (total === 0) return 'none';
+  if (qualified > 0 && qualified === total) return 'q';
+  if (qualified > 0) return 'partial';
+  return 'nq';
+}
+
+// ══════════════════════════════════════════════════════════
+// ATHLETES
+// ══════════════════════════════════════════════════════════
+function addAthlete() {
+  const name = document.getElementById('inp-name').value.trim();
+  const cat  = document.getElementById('inp-cat').value;
+  const sex  = document.getElementById('inp-sex').value;
+  if (!name || !cat) { alert('Entrez un nom et une catégorie.'); return; }
+  const id = Date.now().toString();
+  athletes.push({ id, name, cat, sex, perfs:{} });
+  save();
+  document.getElementById('inp-name').value = '';
+  renderSidebar();
+  selectAthlete(id);
+}
+
+function deleteAthlete(id, e) {
+  e.stopPropagation();
+  if (!confirm('Supprimer cet athlète ?')) return;
+  athletes = athletes.filter(a => a.id !== id);
+  if (currentId === id) { currentId = null; renderMain(); }
+  save();
+  renderSidebar();
+}
+
+function selectAthlete(id) {
+  currentId = id;
+  renderSidebar();
+  renderMain();
+}
+
+function updatePerf(athleteId, eventKey, min, sec, cent) {
+  const a = athletes.find(a => a.id === athleteId);
+  if (!a) return;
+  const val = toSeconds(min, sec, cent);
+  a.perfs[eventKey] = val;
+  save();
+  // mise à jour douce : juste les badges et statuts
+  renderSidebar();
+  updateEventCard(athleteId, eventKey, val);
+  updateGlobalStatus(a);
+  updateSummaryTable(a);
+}
+
+// ══════════════════════════════════════════════════════════
+// RENDER SIDEBAR
+// ══════════════════════════════════════════════════════════
+function renderSidebar() {
+  const list = document.getElementById('athletes-list');
+  if (athletes.length === 0) {
+    list.innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center;padding:12px;">Aucun athlète</div>';
+    return;
+  }
+  list.innerHTML = athletes.map(a => {
+    const status = getAthleteStatus(a);
+    const badges = buildBadges(a);
+    return `
+    <div class="athlete-item ${currentId===a.id?'active':''}" onclick="selectAthlete('${a.id}')">
+      <div>
+        <div class="athlete-name">${a.name}</div>
+        <div class="athlete-cat">${a.cat}</div>
+        <div class="athlete-badges" style="margin-top:4px">${badges}</div>
+      </div>
+      <button class="btn-delete" onclick="deleteAthlete('${a.id}',event)">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function buildBadges(a) {
+  const events = getEvents(a.cat);
+  return events.map(ev => {
+    const perf = a.perfs?.[ev.key];
+    if (!perf) return '';
+    const q = isQualified(a.cat, ev.key, perf);
+    if (q === null) return '';
+    return `<span class="mini-badge ${q?'q':'nq'}">${ev.label}</span>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════════
+// RENDER MAIN
+// ══════════════════════════════════════════════════════════
+function renderMain() {
+  const main = document.getElementById('main');
+  if (!currentId) {
+    main.innerHTML = `<div class="empty-state"><div class="icon">🏃</div><p>Sélectionnez un athlète<br>pour saisir ses performances.</p></div>`;
+    return;
+  }
+  const a = athletes.find(x => x.id === currentId);
+  if (!a) return;
+  const events = getEvents(a.cat);
+  const miniData = MINIMA[a.cat] || {};
+
+  // global status
+  const status = getAthleteStatus(a);
+  const statusLabel = { q:'✓ Qualifié(e)', nq:'✗ Non qualifié(e)', partial:'◑ Partiellement', none:'— En attente' }[status];
+
+  // épreuves haies label
+  const hurdleKey = MALE_CATS.includes(a.cat) ? '110mH' : '100mH';
+
+  main.innerHTML = `
+  <div class="detail-header">
+    <div>
+      <div class="detail-name">${a.name}</div>
+      <div class="detail-meta">Catégorie : <strong>${a.cat}</strong> &nbsp;·&nbsp; ${MALE_CATS.includes(a.cat)?'Masculin':'Féminin'}</div>
+    </div>
+    <div id="global-status" class="global-status ${status}">${statusLabel}</div>
+  </div>
+
+  <!-- MINIMA RAPPEL -->
+  <div class="minima-panel">
+    <div class="minima-panel-title">Minimas ${a.cat}</div>
+    <div class="minima-grid">
+      <div class="mh">Épreuve</div>
+      ${events.map(ev=>`<div class="mh" style="text-align:center">${ev.label}</div>`).join('')}
+      <div class="mcat">${a.cat}</div>
+      ${events.map(ev=>`<div class="mv">${formatTime(miniData[ev.key])}</div>`).join('')}
+    </div>
+  </div>
+
+  <!-- SAISIE PERFORMANCES -->
+  <div class="section-title">Saisie des performances</div>
+  <div class="events-grid" id="events-grid">
+    ${events.map(ev => renderEventCard(a, ev)).join('')}
+  </div>
+
+  <!-- TABLEAU RÉCAP -->
+  <div class="section-title">Récapitulatif</div>
+  <div id="summary-table-wrapper">
+    ${renderSummaryTable(a, events)}
+  </div>
+  `;
+}
+
+function renderEventCard(a, ev) {
+  const perf = a.perfs?.[ev.key] || 0;
+  const mini = MINIMA[a.cat]?.[ev.key];
+  const q = isQualified(a.cat, ev.key, perf);
+
+  // décompose le temps
+  const totalSec = perf;
+  const m = totalSec > 0 ? Math.floor(totalSec/60) : 0;
+  const s = totalSec > 0 ? Math.floor(totalSec%60) : 0;
+  const c = totalSec > 0 ? Math.round((totalSec - Math.floor(totalSec))*100) : 0;
+
+  const cardClass = q === true ? 'qualified' : q === false ? 'not-qualified' : 'no-perf';
+  const badgeClass = q === true ? 'q' : q === false ? 'nq' : 'none';
+  const badgeLabel = q === true ? '✓ Qualifié(e)' : q === false ? '✗ Non qualifié(e)' : '— Saisir performance';
+  const ec = (q !== null && perf > 0) ? ecartStr(perf, mini) : null;
+
+  return `
+  <div class="event-card ${cardClass}" id="card-${a.id}-${ev.key}">
+    <div class="event-name">${ev.label}</div>
+    <div class="perf-input-group">
+      <label>Perf.</label>
+      <div class="time-inputs">
+        <input class="min" type="number" min="0" max="9" placeholder="0"
+          value="${m||''}"
+          oninput="handleInput('${a.id}','${ev.key}',this,'sec-${a.id}-${ev.key}','cent-${a.id}-${ev.key}')"
+          title="Minutes">
+        <span class="sep">'</span>
+        <input class="sec" type="number" min="0" max="59" placeholder="00" id="sec-${a.id}-${ev.key}"
+          value="${s>0||m>0?String(s).padStart(2,'0'):''}"
+          oninput="handleInput('${a.id}','${ev.key}',null,'sec-${a.id}-${ev.key}','cent-${a.id}-${ev.key}')"
+          title="Secondes">
+        <span class="sep">"</span>
+        <input class="cent" type="number" min="0" max="99" placeholder="00" id="cent-${a.id}-${ev.key}"
+          value="${c>0||s>0||m>0?String(c).padStart(2,'0'):''}"
+          oninput="handleInput('${a.id}','${ev.key}',null,'sec-${a.id}-${ev.key}','cent-${a.id}-${ev.key}')"
+          title="Centièmes">
+      </div>
+    </div>
+    <div class="minima-line">Mini : <span>${formatTime(mini)}</span></div>
+    <div class="result-badge ${badgeClass}" id="badge-${a.id}-${ev.key}">${badgeLabel}</div>
+    ${ec ? `<span class="ecart ${ec.cls}" id="ecart-${a.id}-${ev.key}">${ec.txt}</span>` : `<span class="ecart" id="ecart-${a.id}-${ev.key}"></span>`}
+  </div>`;
+}
+
+function handleInput(athleteId, eventKey, minEl, secId, centId) {
+  const secEl  = document.getElementById(secId);
+  const centEl = document.getElementById(centId);
+  const minVal = minEl ? parseInt(minEl.value)||0 : 0;
+  // si pas de minutes, récupère depuis le 1er input
+  let mv = 0;
+  const cards = document.querySelectorAll(`[id^="card-${athleteId}-"]`);
+  // cherche la valeur min depuis l'input minutes du bon card
+  const minInput = document.querySelector(`#card-${athleteId}-${eventKey} .min`);
+  if (minInput) mv = parseInt(minInput.value)||0;
+
+  const sv = parseInt(secEl?.value)||0;
+  const cv = parseInt(centEl?.value)||0;
+  updatePerf(athleteId, eventKey, mv, sv, cv);
+}
+
+function updateEventCard(athleteId, eventKey, perf) {
+  const a = athletes.find(x => x.id === athleteId);
+  if (!a) return;
+  const mini = MINIMA[a.cat]?.[eventKey];
+  const q = isQualified(a.cat, eventKey, perf);
+  const card = document.getElementById(`card-${athleteId}-${eventKey}`);
+  if (!card) return;
+  card.className = `event-card ${q===true?'qualified':q===false?'not-qualified':'no-perf'}`;
+  const badge = document.getElementById(`badge-${athleteId}-${eventKey}`);
+  if (badge) {
+    badge.className = `result-badge ${q===true?'q':q===false?'nq':'none'}`;
+    badge.textContent = q===true?'✓ Qualifié(e)':q===false?'✗ Non qualifié(e)':'— Saisir performance';
+  }
+  const ecartEl = document.getElementById(`ecart-${athleteId}-${eventKey}`);
+  if (ecartEl && q !== null && perf > 0) {
+    const ec = ecartStr(perf, mini);
+    ecartEl.className = `ecart ${ec.cls}`;
+    ecartEl.textContent = ec.txt;
+  } else if (ecartEl) {
+    ecartEl.textContent = '';
+  }
+}
+
+function updateGlobalStatus(a) {
+  const el = document.getElementById('global-status');
+  if (!el) return;
+  const status = getAthleteStatus(a);
+  const labels = { q:'✓ Qualifié(e)', nq:'✗ Non qualifié(e)', partial:'◑ Partiellement', none:'— En attente' };
+  el.className = `global-status ${status}`;
+  el.textContent = labels[status];
+}
+
+function renderSummaryTable(a, events) {
+  return `
+  <table class="summary-table">
+    <thead>
+      <tr>
+        <th>Épreuve</th>
+        <th>Performance</th>
+        <th>Minima</th>
+        <th>Écart</th>
+        <th>Statut</th>
+      </tr>
+    </thead>
+    <tbody id="summary-tbody-${a.id}">
+      ${events.map(ev => summaryRow(a, ev)).join('')}
+    </tbody>
+  </table>`;
+}
+
+function summaryRow(a, ev) {
+  const perf = a.perfs?.[ev.key] || 0;
+  const mini = MINIMA[a.cat]?.[ev.key];
+  const q = isQualified(a.cat, ev.key, perf);
+  const ec = (q !== null && perf > 0) ? ecartStr(perf, mini) : null;
+  return `
+  <tr id="sumrow-${a.id}-${ev.key}">
+    <td>${ev.label}</td>
+    <td>${perf > 0 ? formatTime(perf) : '<span class="none-cell">—</span>'}</td>
+    <td>${formatTime(mini)}</td>
+    <td>${ec ? `<span class="${ec.cls}">${ec.txt}</span>` : '<span class="none-cell">—</span>'}</td>
+    <td>${q===true?'<span class="q-cell">✓ Qualifié(e)</span>':q===false?'<span class="nq-cell">✗ Non qualifié(e)</span>':'<span class="none-cell">—</span>'}</td>
+  </tr>`;
+}
+
+function updateSummaryTable(a) {
+  const tbody = document.getElementById(`summary-tbody-${a.id}`);
+  if (!tbody) return;
+  const events = getEvents(a.cat);
+  tbody.innerHTML = events.map(ev => summaryRow(a, ev)).join('');
+}
+
+// ══════════════════════════════════════════════════════════
+// EXPORT CSV
+// ══════════════════════════════════════════════════════════
+function exportCSV() {
+  if (athletes.length === 0) { alert('Aucun athlète à exporter.'); return; }
+  const headers = ['Nom','Catégorie','100m','200m','400m','Haies','400m Haies','Qualifications'];
+  const rows = athletes.map(a => {
+    const events = getEvents(a.cat);
+    const perfs = events.map(ev => formatTime(a.perfs?.[ev.key]));
+    const quals = events.map(ev => {
+      const q = isQualified(a.cat, ev.key, a.perfs?.[ev.key]);
+      return q===true?'Q':q===false?'NQ':'—';
+    }).join(' / ');
+    return [a.name, a.cat, ...perfs, quals].join(';');
+  });
+  const csv = [headers.join(';'), ...rows].join('\n');
+  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url; link.download = 'qualifications_regionaux.csv'; link.click();
+}
+
+// ══════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════
+renderSidebar();
+if (athletes.length > 0) selectAthlete(athletes[0].id);
+</script>
+</body>
+</html>
